@@ -7,6 +7,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TailwindCss</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+  <!-- <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('dropdown', () => ({
+        open: false,
+
+        toggle() {
+          this.open = !this.open
+        }
+      }))
+      Alpine.data('collapse', () => ({
+        open: false,
+
+        toggle() {
+          this.open = !this.open
+        }
+      }))
+    })
+
+  </script> -->
 </head>
 
 <body>
@@ -27,14 +47,13 @@
   ```
 -->
   <div class="bg-white">
-    <div>
+    <div x-data="slide" @keydown.window.escape="open=false">
       <!--
       Mobile filter dialog
 
       Off-canvas filters for mobile, show/hide based on off-canvas filters state.
     -->
-      <div class="fixed inset-0 flex z-40 transition-opacity ease-linear duration-300 opacity-0 translate-x-full"
-        role="dialog" aria-modal="true" id="mobileMenu">
+      <div class="fixed inset-0 flex z-40 " x-show="open" role="dialog" aria-modal="true">
         <!--
         Off-canvas menu overlay, show/hide based on off-canvas menu state.
 
@@ -45,7 +64,10 @@
           From: "opacity-100"
           To: "opacity-0"
       -->
-        <div class="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true"></div>
+        <div x-show="open" class="fixed inset-0 bg-black bg-opacity-25" x-on:click="open=false"
+          x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300"
+          x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-hidden="true"></div>
 
         <!--
         Off-canvas menu, show/hide based on off-canvas menu state.
@@ -57,11 +79,14 @@
           From: "translate-x-0"
           To: "translate-x-full"
       -->
-        <div
-          class="ml-auto relative max-w-xs w-full h-full bg-white shadow-xl py-4 pb-12 flex flex-col overflow-y-auto">
+        <div x-show="open"
+          class="ml-auto relative max-w-xs w-full h-full bg-white shadow-xl py-4 pb-12 flex flex-col overflow-y-auto"
+          x-transition:enter="transition ease-in-out duration-300 transform" x-transition:enter-start="translate-x-full"
+          x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in-out duration-300 transform"
+          x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
           <div class="px-4 flex items-center justify-between">
             <h2 class="text-lg font-medium text-gray-900">Filters</h2>
-            <button type="button" id="close"
+            <button type="button" id="close" x-on:click="toggle"
               class="-mr-2 w-10 h-10 bg-white p-2 rounded-md flex items-center justify-center text-gray-400">
               <span class="sr-only">Close menu</span>
               <!-- Heroicon name: outline/x -->
@@ -97,10 +122,10 @@
               </li>
             </ul>
 
-            <div class="border-t border-gray-200 px-4 py-6">
+            <div class="border-t border-gray-200 px-4 py-6" x-data="slide">
               <h3 class="-mx-2 -my-3 flow-root">
                 <!-- Expand/collapse section button -->
-                <button type="button" data-collapse-toggle="filter-section-mobile-0"
+                <button type="button" x-on:click="toggle"
                   class="px-2 py-3 bg-white w-full flex items-center justify-between text-gray-400 hover:text-gray-500"
                   aria-controls="filter-section-mobile-0" aria-expanded="false">
                   <span class="font-medium text-gray-900"> Color </span>
@@ -110,8 +135,8 @@
 
                     Heroicon name: solid/plus-sm
                   -->
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                      aria-hidden="true">
+                    <svg class="h-5 w-5" :class="{'hidden':open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                      fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd"
                         d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                         clip-rule="evenodd" />
@@ -121,8 +146,8 @@
 
                     Heroicon name: solid/minus-sm
                   -->
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                      aria-hidden="true">
+                    <svg class="h-5 w-5" :class="{'hidden':!open}" xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
                         clip-rule="evenodd" />
                     </svg>
@@ -130,7 +155,7 @@
                 </button>
               </h3>
               <!-- Filter section, show/hide based on section state. -->
-              <div class="pt-6 hidden" id="filter-section-mobile-0">
+              <div class="pt-6" x-show="open" id="filter-section-mobile-0">
                 <div class="space-y-6">
                   <div class="flex items-center">
                     <input id="filter-mobile-color-0" name="color[]" value="white" type="checkbox"
@@ -171,10 +196,10 @@
               </div>
             </div>
 
-            <div class="border-t border-gray-200 px-4 py-6">
+            <div class="border-t border-gray-200 px-4 py-6" x-data="slide">
               <h3 class="-mx-2 -my-3 flow-root">
                 <!-- Expand/collapse section button -->
-                <button type="button" data-collapse-toggle="filter-section-mobile-1"
+                <button type="button" x-on:click="toggle"
                   class="px-2 py-3 bg-white w-full flex items-center justify-between text-gray-400 hover:text-gray-500"
                   aria-controls="filter-section-mobile-1" aria-expanded="false">
                   <span class="font-medium text-gray-900"> Category </span>
@@ -184,8 +209,8 @@
 
                     Heroicon name: solid/plus-sm
                   -->
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                      aria-hidden="true">
+                    <svg class="h-5 w-5" :class="{'hidden':open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                      fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd"
                         d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                         clip-rule="evenodd" />
@@ -195,8 +220,8 @@
 
                     Heroicon name: solid/minus-sm
                   -->
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                      aria-hidden="true">
+                    <svg class="h-5 w-5" :class="{'hidden':!open}" xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
                         clip-rule="evenodd" />
                     </svg>
@@ -204,7 +229,7 @@
                 </button>
               </h3>
               <!-- Filter section, show/hide based on section state. -->
-              <div class="pt-6 hidden" id="filter-section-mobile-1">
+              <div class="pt-6" x-show="open" id="filter-section-mobile-1">
                 <div class="space-y-6">
                   <div class="flex items-center">
                     <input id="filter-mobile-category-0" name="category[]" value="new-arrivals" type="checkbox"
@@ -242,10 +267,10 @@
               </div>
             </div>
 
-            <div class="border-t border-gray-200 px-4 py-6">
+            <div class="border-t border-gray-200 px-4 py-6" x-data="slide">
               <h3 class="-mx-2 -my-3 flow-root">
                 <!-- Expand/collapse section button -->
-                <button type="button" data-collapse-toggle="filter-section-mobile-2"
+                <button type="button" x-on:click="toggle"
                   class="px-2 py-3 bg-white w-full flex items-center justify-between text-gray-400 hover:text-gray-500"
                   aria-controls="filter-section-mobile-2" aria-expanded="false">
                   <span class="font-medium text-gray-900"> Size </span>
@@ -255,8 +280,8 @@
 
                     Heroicon name: solid/plus-sm
                   -->
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                      aria-hidden="true">
+                    <svg class="h-5 w-5" :class="{'hidden':open}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                      fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd"
                         d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                         clip-rule="evenodd" />
@@ -266,8 +291,8 @@
 
                     Heroicon name: solid/minus-sm
                   -->
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                      aria-hidden="true">
+                    <svg class="h-5 w-5" :class="{'hidden':!open}" xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                       <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
                         clip-rule="evenodd" />
                     </svg>
@@ -275,7 +300,7 @@
                 </button>
               </h3>
               <!-- Filter section, show/hide based on section state. -->
-              <div class="pt-6 hidden" id="filter-section-mobile-2">
+              <div class="pt-6" x-show="open" id="filter-section-mobile-2">
                 <div class="space-y-6">
                   <div class="flex items-center">
                     <input id="filter-mobile-size-0" name="size[]" value="2l" type="checkbox"
@@ -324,25 +349,35 @@
           <h1 class="text-4xl font-extrabold tracking-tight text-gray-900">New Arrivals</h1>
 
           <div class="flex items-center">
-            <div class="relative inline-block text-left">
+            <div class="relative inline-block text-left" x-data="slide" x-id="['dropdown-button']">
               <div>
-                <button type="button" data-dropdown-toggle="sort"
+                <button type="button" data-dropdown-toggle="sort" x-ref="button" x-on:click="toggle"
+                  :aria-expanded="open" :aria-controls="$id('dropdown-button')"
                   class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
-                  id="menu-button" aria-expanded="false" aria-haspopup="true">
+                  id="menu-button" aria-haspopup="true">
                   Sort
                   <!-- Heroicon name: solid/chevron-down -->
-                  <svg
-                    class="flex-shrink-0 -mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500 transition-all duration-300"
+
+
+                  <svg :class="{'rotate-180':open,'rotate-0':!open}"
+                    class="flex-shrink-0 -mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500 transition-all duration-500 "
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd"
                       d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                       clip-rule="evenodd" />
                   </svg>
+
                 </button>
               </div>
 
-              <div id="sort"
-                class="hidden origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+              <div id="sort" x-ref="panel" x-show="open" x-on:click.outside="open=false"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                class="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                 role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                 <div class="py-1" role="none">
                   <!--
@@ -350,20 +385,20 @@
 
                   Selected: "font-medium text-gray-900", Not Selected: "text-gray-500"
                 -->
-                  <a href="#" class="font-medium text-gray-900 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-0"> Most Popular </a>
+                  <a href="#" class="font-medium text-gray-900 block px-4 py-2 text-sm hover:bg-gray-100"
+                    role="menuitem" tabindex="-1" id="menu-item-0"> Most Popular </a>
 
-                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-1"> Best Rating </a>
+                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem"
+                    tabindex="-1" id="menu-item-1"> Best Rating </a>
 
-                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-2"> Newest </a>
+                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem"
+                    tabindex="-1" id="menu-item-2"> Newest </a>
 
-                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-3"> Price: Low to High </a>
+                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem"
+                    tabindex="-1" id="menu-item-3"> Price: Low to High </a>
 
-                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm" role="menuitem" tabindex="-1"
-                    id="menu-item-4"> Price: High to Low </a>
+                  <a href="#" class="text-gray-500 block px-4 py-2 text-sm hover:bg-gray-100" role="menuitem"
+                    tabindex="-1" id="menu-item-4"> Price: High to Low </a>
                 </div>
               </div>
             </div>
@@ -377,16 +412,20 @@
                   d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
             </button>
-            <button type="button" class="p-2 -m-2 ml-4 sm:ml-6 text-gray-400 hover:text-gray-500 lg:hidden" id="filter">
-              <span class="sr-only">Filters</span>
-              <!-- Heroicon name: solid/filter -->
-              <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                  clip-rule="evenodd" />
-              </svg>
-            </button>
+            <span x-data>
+
+              <button type="button" class="p-2 -m-2 ml-4 sm:ml-6 text-gray-400 hover:text-gray-500 lg:hidden"
+                x-on:click="toggle">
+                <span class="sr-only">Filters</span>
+                <!-- Heroicon name: solid/filter -->
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                  fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
+                    clip-rule="evenodd" />
+                </svg>
+              </button>
+            </span>
           </div>
         </div>
 
@@ -419,10 +458,10 @@
                 </li>
               </ul>
 
-              <div class="border-b border-gray-200 py-6">
+              <div class="border-b border-gray-200 py-6" x-data="slide">
                 <h3 class="-my-3 flow-root">
                   <!-- Expand/collapse section button -->
-                  <button type="button" data-collapse-toggle="filter-section-0"
+                  <button type="button" data-collapse-toggle="filter-section-0" x-on:click="toggle"
                     class="py-3 bg-white w-full flex items-center justify-between text-sm text-gray-400 hover:text-gray-500"
                     aria-controls="filter-section-0" aria-expanded="false">
                     <span class="font-medium text-gray-900"> Color </span>
@@ -432,8 +471,8 @@
 
                       Heroicon name: solid/plus-sm
                     -->
-                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                        aria-hidden="true">
+                      <svg class="h-5 w-5" :class="{'hidden': open}" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                           d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                           clip-rule="evenodd" />
@@ -443,8 +482,8 @@
 
                       Heroicon name: solid/minus-sm
                     -->
-                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                        aria-hidden="true">
+                      <svg class="h-5 w-5" :class="{'hidden':!open}" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
                           clip-rule="evenodd" />
                       </svg>
@@ -452,7 +491,7 @@
                   </button>
                 </h3>
                 <!-- Filter section, show/hide based on section state. -->
-                <div class="pt-6 hidden" id="filter-section-0">
+                <div class="pt-6" x-show="open" id="filter-section-0">
                   <div class="space-y-4">
                     <div class="flex items-center">
                       <input id="filter-color-0" name="color[]" value="white" type="checkbox"
@@ -493,10 +532,10 @@
                 </div>
               </div>
 
-              <div class="border-b border-gray-200 py-6">
+              <div class="border-b border-gray-200 py-6" x-data="slide">
                 <h3 class="-my-3 flow-root">
                   <!-- Expand/collapse section button -->
-                  <button type="button" data-collapse-toggle="filter-section-1"
+                  <button type="button" data-collapse-toggle="filter-section-1" x-on:click="toggle"
                     class="py-3 bg-white w-full flex items-center justify-between text-sm text-gray-400 hover:text-gray-500"
                     aria-controls="filter-section-1" aria-expanded="false">
                     <span class="font-medium text-gray-900"> Category </span>
@@ -506,8 +545,8 @@
 
                       Heroicon name: solid/plus-sm
                     -->
-                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                        aria-hidden="true">
+                      <svg class="h-5 w-5" :class="{'hidden': open}" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                           d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                           clip-rule="evenodd" />
@@ -517,8 +556,8 @@
 
                       Heroicon name: solid/minus-sm
                     -->
-                      <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                        aria-hidden="true">
+                      <svg class="h-5 w-5" :class="{'hidden': !open}" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
                           clip-rule="evenodd" />
                       </svg>
@@ -526,7 +565,7 @@
                   </button>
                 </h3>
                 <!-- Filter section, show/hide based on section state. -->
-                <div class="pt-6 hidden" id="filter-section-1">
+                <div class="pt-6" x-show="open" id="filter-section-1">
                   <div class="space-y-4">
                     <div class="flex items-center">
                       <input id="filter-category-0" name="category[]" value="new-arrivals" type="checkbox"
@@ -561,10 +600,10 @@
                 </div>
               </div>
 
-              <div class="border-b border-gray-200 py-6">
+              <div class="border-b border-gray-200 py-6" x-data="slide">
                 <h3 class="-my-3 flow-root">
                   <!-- Expand/collapse section button -->
-                  <button type="button" data-collapse-toggle="filter-section-2"
+                  <button type="button" data-collapse-toggle="filter-section-2" x-on:click="toggle"
                     class="py-3 bg-white w-full flex items-center justify-between text-sm text-gray-400 hover:text-gray-500"
                     aria-controls="filter-section-2" aria-expanded="false">
                     <span class="font-medium text-gray-900"> Size </span>
@@ -574,8 +613,8 @@
 
                       Heroicon name: solid/plus-sm
                     -->
-                      <svg data-collapse-icon class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor" aria-hidden="true">
+                      <svg data-collapse-icon class="h-5 w-5" :class="{'hidden': open}"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                           d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                           clip-rule="evenodd" />
@@ -585,8 +624,8 @@
 
                       Heroicon name: solid/minus-sm
                     -->
-                      <svg data-collapse-icon class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor" aria-hidden="true">
+                      <svg data-collapse-icon class="h-5 w-5" :class="{'hidden': !open}"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
                           clip-rule="evenodd" />
                       </svg>
@@ -594,7 +633,7 @@
                   </button>
                 </h3>
                 <!-- Filter section, show/hide based on section state. -->
-                <div class="pt-6 hidden" id="filter-section-2">
+                <div class="pt-6" x-show="open" id="filter-section-2">
                   <div class="space-y-4">
                     <div class="flex items-center">
                       <input id="filter-size-0" name="size[]" value="2l" type="checkbox"
@@ -639,7 +678,380 @@
             <!-- Product grid -->
             <div class="lg:col-span-3">
               <!-- Replace with your content -->
-              <div class="border-4 border-dashed border-gray-200 rounded-lg h-96 lg:h-full"></div>
+
+
+
+              <div class="w-full bg-white flex items-center justify-center px-4 sm:px-6 lg:px-8" style="height: 700px;">
+                <div class="w-72">
+                  <div x-data="slide" @keydown.window.escape="open = false">
+                    <div class="relative group flex flex-col-reverse">
+                      <div class="mt-4 flex items-center justify-between text-base font-medium text-gray-900 space-x-8">
+                        <h3>
+                          <a href="#">
+                            Basic Tee 6-Pack
+                          </a>
+                        </h3>
+                        <p>$192</p>
+                      </div>
+                      <div class="aspect-w-4 aspect-h-3 rounded-lg overflow-hidden bg-gray-100">
+                        <img src="https://tailwindui.com/img/ecommerce-images/product-quick-preview-02-preview.jpg"
+                          alt="Model wearing gray t-shirt." class="object-center object-cover">
+                        <div class="flex items-end p-4">
+                          <button type="button"
+                            class="relative z-10 w-full bg-white bg-opacity-75 py-2 px-4 rounded-md text-sm text-gray-900 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                            @click="open = true">Quick View<span class="sr-only">, Basic Tee 6-Pack </span></button>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div x-show="open" class="border-4 border-dashed border-gray-200 rounded-lg h-96 lg:h-full">
+
+
+                      <!--
+
+        ```
+      -->
+                      <div class="fixed z-10 inset-0 overflow-y-auto" role="dialog" aria-modal="true">
+                        <div class="flex min-h-screen text-center md:block md:px-2 lg:px-4" style="font-size: 0">
+                          <!--
+            Background overlay, show/hide based on modal state.
+
+            Entering: "ease-out duration-300"
+              From: "opacity-0"
+              To: "opacity-100"
+            Leaving: "ease-in duration-200"
+              From: "opacity-100"
+              To: "opacity-0"
+          -->
+                          <div x-show="open" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity md:block"
+                            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                            x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-300"
+                            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" aria-hidden="true"
+                            x-on:click="toggle"></div>
+
+                          <!-- This element is to trick the browser into centering the modal contents. -->
+                          <span class="hidden md:inline-block md:align-middle md:h-screen"
+                            aria-hidden="true">&#8203;</span>
+
+                          <!--
+            Modal panel, show/hide based on modal state.
+
+            Entering: "ease-out duration-300"
+              From: "opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
+              To: "opacity-100 translate-y-0 md:scale-100"
+            Leaving: "ease-in duration-200"
+              From: "opacity-100 translate-y-0 md:scale-100"
+              To: "opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
+          -->
+                          <div x-show="open"
+                            class="flex text-base text-left transform transition w-full md:inline-block md:max-w-2xl md:px-4 md:my-8 md:align-middle lg:max-w-4xl"
+                            x-transition-enter="ease-out duration-300"
+                            x-transition-enter-start="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
+                            x-transition-enter-end="opacity-100 translate-y-0 md:scale-100"
+                            x-transition-leave="ease-in duration-200"
+                            x-transition-leave-start="opacity-100 translate-y-0 md:scale-100"
+                            x-transition-leave-end="opacity-0 translate-y-4 md:translate-y-0 md:scale-95">
+                            <div
+                              class="w-full relative flex items-center bg-white px-4 pt-14 pb-8 overflow-hidden shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
+                              <button type="button" x-on:click="open=false"
+                                class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 sm:top-8 sm:right-6 md:top-6 md:right-6 lg:top-8 lg:right-8">
+                                <span class="sr-only">Close</span>
+                                <!-- Heroicon name: outline/x -->
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                  stroke="currentColor" aria-hidden="true">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+
+                              <div
+                                class="w-full grid grid-cols-1 gap-y-8 gap-x-6 items-start sm:grid-cols-12 lg:gap-x-8">
+                                <div
+                                  class="aspect-w-2 aspect-h-3 rounded-lg bg-gray-100 overflow-hidden sm:col-span-4 lg:col-span-5">
+                                  <img
+                                    src="https://tailwindui.com/img/ecommerce-images/product-quick-preview-02-detail.jpg"
+                                    alt="Two each of gray, white, and black shirts arranged on table."
+                                    class="object-center object-cover">
+                                </div>
+                                <div class="sm:col-span-8 lg:col-span-7">
+                                  <h2 class="text-2xl font-extrabold text-gray-900 sm:pr-12">Basic Tee 6-Pack</h2>
+
+                                  <section aria-labelledby="information-heading" class="mt-2">
+                                    <h3 id="information-heading" class="sr-only">Product information</h3>
+
+                                    <p class="text-2xl text-gray-900">$192</p>
+
+                                    <!-- Reviews -->
+                                    <div class="mt-6">
+                                      <h4 class="sr-only">Reviews</h4>
+                                      <div class="flex items-center">
+                                        <div class="flex items-center">
+                                          <!--
+                            Heroicon name: solid/star
+
+                            Active: "text-gray-900", Default: "text-gray-200"
+                          -->
+                                          <svg class="text-gray-900 h-5 w-5 flex-shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                            aria-hidden="true">
+                                            <path
+                                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                          </svg>
+
+                                          <!-- Heroicon name: solid/star -->
+                                          <svg class="text-gray-900 h-5 w-5 flex-shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                            aria-hidden="true">
+                                            <path
+                                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                          </svg>
+
+                                          <!-- Heroicon name: solid/star -->
+                                          <svg class="text-gray-900 h-5 w-5 flex-shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                            aria-hidden="true">
+                                            <path
+                                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                          </svg>
+
+                                          <!-- Heroicon name: solid/star -->
+                                          <svg class="text-gray-900 h-5 w-5 flex-shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                            aria-hidden="true">
+                                            <path
+                                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                          </svg>
+
+                                          <!-- Heroicon name: solid/star -->
+                                          <svg class="text-gray-200 h-5 w-5 flex-shrink-0"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                            aria-hidden="true">
+                                            <path
+                                              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                          </svg>
+                                        </div>
+                                        <p class="sr-only">3.9 out of 5 stars</p>
+                                        <a href="#"
+                                          class="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500">117
+                                          reviews</a>
+                                      </div>
+                                    </div>
+                                  </section>
+
+                                  <section aria-labelledby="options-heading" class="mt-10">
+                                    <h3 id="options-heading" class="sr-only">Product options</h3>
+
+                                    <form>
+                                      <!-- Colors -->
+                                      <div>
+                                        <h4 class="text-sm text-gray-900 font-medium">Color</h4>
+
+                                        <fieldset class="mt-4">
+                                          <legend class="sr-only">Choose a color</legend>
+                                          <div class="flex items-center space-x-3">
+                                            <!--
+                              Active and Checked: "ring ring-offset-1"
+                              Not Active and Checked: "ring-2"
+                            -->
+                                            <label
+                                              class="-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none ring-gray-400">
+                                              <input type="radio" name="color-choice" value="White" class="sr-only"
+                                                aria-labelledby="color-choice-0-label">
+                                              <p id="color-choice-0-label" class="sr-only">White</p>
+                                              <span aria-hidden="true"
+                                                class="h-8 w-8 bg-white border border-black border-opacity-10 rounded-full"></span>
+                                            </label>
+
+                                            <!--
+                              Active and Checked: "ring ring-offset-1"
+                              Not Active and Checked: "ring-2"
+                            -->
+                                            <label
+                                              class="-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none ring-gray-400">
+                                              <input type="radio" name="color-choice" value="Gray" class="sr-only"
+                                                aria-labelledby="color-choice-1-label">
+                                              <p id="color-choice-1-label" class="sr-only">Gray</p>
+                                              <span aria-hidden="true"
+                                                class="h-8 w-8 bg-gray-200 border border-black border-opacity-10 rounded-full"></span>
+                                            </label>
+
+                                            <!--
+                              Active and Checked: "ring ring-offset-1"
+                              Not Active and Checked: "ring-2"
+                            -->
+                                            <label
+                                              class="-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none ring-gray-900">
+                                              <input type="radio" name="color-choice" value="Black" class="sr-only"
+                                                aria-labelledby="color-choice-2-label">
+                                              <p id="color-choice-2-label" class="sr-only">Black</p>
+                                              <span aria-hidden="true"
+                                                class="h-8 w-8 bg-gray-900 border border-black border-opacity-10 rounded-full"></span>
+                                            </label>
+                                          </div>
+                                        </fieldset>
+                                      </div>
+
+                                      <!-- Sizes -->
+                                      <div class="mt-10">
+                                        <div class="flex items-center justify-between">
+                                          <h4 class="text-sm text-gray-900 font-medium">Size</h4>
+                                          <a href="#"
+                                            class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Size
+                                            guide</a>
+                                        </div>
+
+                                        <fieldset class="mt-4">
+                                          <legend class="sr-only">Choose a size</legend>
+                                          <div class="grid grid-cols-4 gap-4">
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="XXS" class="sr-only"
+                                                aria-labelledby="size-choice-0-label">
+                                              <p id="size-choice-0-label">XXS</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="XS" class="sr-only"
+                                                aria-labelledby="size-choice-1-label">
+                                              <p id="size-choice-1-label">XS</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="S" class="sr-only"
+                                                aria-labelledby="size-choice-2-label">
+                                              <p id="size-choice-2-label">S</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="M" class="sr-only"
+                                                aria-labelledby="size-choice-3-label">
+                                              <p id="size-choice-3-label">M</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="L" class="sr-only"
+                                                aria-labelledby="size-choice-4-label">
+                                              <p id="size-choice-4-label">L</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="XL" class="sr-only"
+                                                aria-labelledby="size-choice-5-label">
+                                              <p id="size-choice-5-label">XL</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-white shadow-sm text-gray-900 cursor-pointer">
+                                              <input type="radio" name="size-choice" value="XXL" class="sr-only"
+                                                aria-labelledby="size-choice-6-label">
+                                              <p id="size-choice-6-label">XXL</p>
+
+                                              <!--
+                                Active: "border", Not Active: "border-2"
+                                Checked: "border-indigo-500", Not Checked: "border-transparent"
+                              -->
+                                              <div class="absolute -inset-px rounded-md pointer-events-none"
+                                                aria-hidden="true"></div>
+                                            </label>
+
+                                            <!-- Active: "ring-2 ring-indigo-500" -->
+                                            <label
+                                              class="group relative border rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1 bg-gray-50 text-gray-200 cursor-not-allowed">
+                                              <input type="radio" name="size-choice" value="XXXL" disabled
+                                                class="sr-only" aria-labelledby="size-choice-7-label">
+                                              <p id="size-choice-7-label">XXXL</p>
+
+                                              <div aria-hidden="true"
+                                                class="absolute -inset-px rounded-md border-2 border-gray-200 pointer-events-none">
+                                                <svg class="absolute inset-0 w-full h-full text-gray-200 stroke-2"
+                                                  viewBox="0 0 100 100" preserveAspectRatio="none"
+                                                  stroke="currentColor">
+                                                  <line x1="0" y1="100" x2="100" y2="0"
+                                                    vector-effect="non-scaling-stroke" />
+                                                </svg>
+                                              </div>
+                                            </label>
+                                          </div>
+                                        </fieldset>
+                                      </div>
+
+                                      <button type="submit"
+                                        class="mt-6 w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add
+                                        to bag</button>
+                                    </form>
+                                  </section>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+
+
+
+
               <!-- /End replace -->
             </div>
           </div>
@@ -648,20 +1060,30 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/@themesberg/flowbite@latest/dist/flowbite.bundle.js"></script>
+
+
+
+
+
   <script>
-    var filterBtn = document.getElementById("filter");
-    var closeBtn = document.getElementById("close")
-    var mobileMenuDiv = document.getElementById("mobileMenu")
-    filterBtn.addEventListener("click", () => {
-      mobileMenuDiv.classList.remove("opacity-0", "translate-x-full")
-      mobileMenuDiv.classList.add("opacity-1", "translate-x-0")
-    })
-    closeBtn.addEventListener("click", () => {
-      mobileMenuDiv.classList.remove("opacity-1", "translate-x-0")
-      mobileMenuDiv.classList.add("opacity-0", "translate-x-full")
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('slide', () => ({
+        open: false,
+        toggle() {
+          this.open = !this.open
+        }
+      }))
+      Alpine.data('collapse', () => ({
+        open: false,
+        toggle() {
+          this.open = !this.open
+        }
+      }))
+
+
     })
   </script>
+
 </body>
 
 </html>
